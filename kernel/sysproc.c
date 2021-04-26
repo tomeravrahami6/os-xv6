@@ -95,3 +95,38 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64 
+sys_trace(void)
+{
+  int mask;
+  int pid;
+  if (argint(0, &mask) < 0)
+    return -1;
+  if (argint(1, &pid) < 0)
+    return -1;
+  return trace(mask, pid);
+}
+
+//int wait_stat(int* status, struct perf * performance)
+uint64 
+sys_wait_stat(void)
+{
+  int status;
+  uint64 performance;
+  if(argint(0, &status) < 0)
+    return -1;
+  if(argaddr(1,&performance) < 0)
+    return -1;
+  return wait_stat(&status, (struct perf*)performance);
+}
+
+//int wait_stat(int* status, struct perf * performance)
+uint64 
+sys_set_priority(void)
+{
+  int priority;
+  if(argint(0, &priority) < 1 || argint(0, &priority) > 5)
+    return -1;
+  return set_priority(priority);
+}

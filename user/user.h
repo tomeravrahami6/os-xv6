@@ -1,5 +1,13 @@
 struct stat;
 struct rtcdate;
+struct perf {
+int ctime;
+int ttime;
+int stime;
+int retime;
+int rutime; 
+int average_bursttime; //average of bursstimes in 100ths (so average*100)
+};
 
 // system calls
 int fork(void);
@@ -23,6 +31,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int trace(int, int);
+int wait_stat(int* status, struct perf * performance);
+int set_priority(int priority);
 
 // ulib.c
 int stat(const char*, struct stat*);

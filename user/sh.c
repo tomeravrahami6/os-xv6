@@ -4,6 +4,7 @@
 #include "user/user.h"
 #include "kernel/fcntl.h"
 
+
 // Parsed command representation
 #define EXEC  1
 #define REDIR 2
@@ -76,6 +77,30 @@ runcmd(struct cmd *cmd)
     if(ecmd->argv[0] == 0)
       exit(1);
     exec(ecmd->argv[0], ecmd->argv);
+
+    char path_as_string[999];
+    int path_file = open("/path",O_RDONLY);
+    read(path_file, path_as_string, 999);
+    close(path_file);
+    int i = 0;
+    int j = 0;
+    while(path_as_string[i] != '\0') {
+      while(path_as_string[j] != ':'){
+        j++;  
+      }
+      int command_length = 0;
+      while (ecmd->argv[0][command_length] != '\0'){
+        command_length++;
+      }
+      char subbuff[command_length+j-i+1];
+      memcpy(subbuff, &path_as_string[i], j-i);
+      memcpy(&subbuff[j-i], ecmd->argv[0], command_length);
+      subbuff[command_length+j-i] = '\0';
+      exec(subbuff, ecmd->argv);
+      j++;
+      i=j;
+    }
+
     fprintf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
 

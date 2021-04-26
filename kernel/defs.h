@@ -8,6 +8,14 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct perf {
+    int ctime;
+    int ttime;
+    int stime;
+    int retime;
+    int rutime; 
+    int average_bursttime; //average of bursstimes in 100ths (so average*100)
+};
 
 // bio.c
 void            binit(void);
@@ -105,6 +113,10 @@ void            yield(void);
 int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
+int             trace(int mask, int pid);
+void            updateStateTicks(void);
+int             wait_stat(int* status, struct perf* performance);
+int             set_priority(int priority);
 
 // swtch.S
 void            swtch(struct context*, struct context*);
@@ -146,6 +158,7 @@ void            trapinit(void);
 void            trapinithart(void);
 extern struct spinlock tickslock;
 void            usertrapret(void);
+uint            getTicks(void);
 
 // uart.c
 void            uartinit(void);

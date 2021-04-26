@@ -7,7 +7,11 @@
 #include "defs.h"
 
 struct spinlock tickslock;
+struct spinlock counterlock;
 uint ticks;
+uint counter;
+
+
 
 extern char trampoline[], uservec[], userret[];
 
@@ -20,6 +24,7 @@ void
 trapinit(void)
 {
   initlock(&tickslock, "time");
+  initlock(&counterlock, "timeCounter");
 }
 
 // set up to take exceptions and traps while in the kernel.
@@ -149,10 +154,19 @@ kerneltrap()
     panic("kerneltrap");
   }
 
-  // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
-    yield();
+  #ifdef FCFS
 
+  #else 
+  // give up the CPU if this is a timer interrupt.
+  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){
+    acquire(&counterlock);
+    if (counter == QUANTUM){
+      counter = 0;
+      yield();
+    }
+    release(&counterlock);
+  }
+  #endif
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
   w_sepc(sepc);
@@ -163,9 +177,14 @@ void
 clockintr()
 {
   acquire(&tickslock);
+  acquire(&counterlock);
   ticks++;
+  counter++;
+  updateStateTicks();
   wakeup(&ticks);
+  wakeup(&counter);
   release(&tickslock);
+  release(&counterlock);
 }
 
 // check if it's an external interrupt or software interrupt,
@@ -216,5 +235,11 @@ devintr()
   } else {
     return 0;
   }
+}
+
+uint
+getTicks()
+{
+  return ticks;
 }
 

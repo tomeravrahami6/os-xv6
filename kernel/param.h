@@ -11,3 +11,10 @@
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define FSSIZE       1000  // size of file system in blocks
 #define MAXPATH      128   // maximum file path name
+#define QUANTUM      5 // swapping out running processes will be done every quantum (measured in clock ticks) instead of every clock tick
+#define ALPHA        50
+#define SIG_DFL      0 /* default signal handling */
+#define SIG_IGN      1 /* ignore signal */
+#define SIGKILL      9
+#define SIGSTOP      17
+#define SIGCONT      19

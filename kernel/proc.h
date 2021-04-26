@@ -92,7 +92,19 @@ struct proc {
   int killed;                  // If non-zero, have been killed
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
-
+  int traceMask;               // mask
+  int ctime;                    // process creation time.
+  int ttime;                    // process termination time.
+  int stime;                    // the total time the process spent in the SLEEPING state.
+  int retime;                   // the total time the process spent in the RUNNABLE state.
+  int rutime;                   // the total time the process spent in the RUNNING state.
+  int average_bursttime;     // approximate estimated burst time (as specified in task 4.3)
+  int decay_factor;             // the decay factor of the priority.
+  uint pending_signals;          // 32bit array, stored as type uint.
+  uint signal_mask;              // 32bit array, stored as type uint.
+  void* signal_handlers [32];         // Array of size 32, of type void*.
+  struct trapframe* user_trap_frame_backup; // Pointer to a trapframe struct stored as struct trapframe*.
+  
   // proc_tree_lock must be held when using this:
   struct proc *parent;         // Parent process
 
